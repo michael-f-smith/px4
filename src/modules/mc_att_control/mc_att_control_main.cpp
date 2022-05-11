@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2013-2018 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2013-2022 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -103,16 +103,41 @@ MulticopterAttitudeControl::throttle_curve(float throttle_stick_input)
 {
 	float thrust = 0.f;
 
+<<<<<<< HEAD
+=======
+	{
+		hover_thrust_estimate_s hte;
+
+		if (_hover_thrust_estimate_sub.update(&hte)) {
+			if (hte.valid) {
+				_hover_thrust = hte.hover_thrust;
+			}
+		}
+	}
+
+	if (!PX4_ISFINITE(_hover_thrust)) {
+		_hover_thrust = _param_mpc_thr_hover.get();
+	}
+
+	// throttle_stick_input is in range [0, 1]
+>>>>>>> 0a90621635 (multicopter hover thrust estimator use vehicle_thrust_setpoint (work in stabilized mode))
 	switch (_param_mpc_thr_curve.get()) {
 	case 1: // no rescaling to hover throttle
 		thrust = math::interpolate(throttle_stick_input, -1.f, 1.f,
 					   _manual_throttle_minimum.getState(), _param_mpc_thr_max.get());
 		break;
 
+<<<<<<< HEAD
 	default: // 0 or other: rescale such that a centered throttle stick corresponds to hover throttle
 		thrust = math::interpolateNXY(throttle_stick_input, {-1.f, 0.f, 1.f},
 		{_manual_throttle_minimum.getState(), _param_mpc_thr_hover.get(), _param_mpc_thr_max.get()});
 		break;
+=======
+	default: // 0 or other: rescale to hover throttle at 0.5 stick
+		return math::gradual3(throttle_stick_input,
+				      0.f, .5f, 1.f,
+				      throttle_min, _hover_thrust, _param_mpc_thr_max.get());
+>>>>>>> 0a90621635 (multicopter hover thrust estimator use vehicle_thrust_setpoint (work in stabilized mode))
 	}
 
 	return math::min(thrust, _manual_throttle_maximum.getState());
