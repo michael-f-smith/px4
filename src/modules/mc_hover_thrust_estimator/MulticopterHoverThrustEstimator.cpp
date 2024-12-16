@@ -198,7 +198,7 @@ void MulticopterHoverThrustEstimator::Run()
 									1.f);
 
 				_hover_thrust_ekf.setMeasurementNoiseScale(fmaxf(meas_noise_coeff_xy, meas_noise_coeff_z));
-				_hover_thrust_ekf.fuseAccZ(-local_pos.az, -(thrust_sp(2)-thrust_unallocated(2)));
+				_hover_thrust_ekf.fuseAccZ(-local_pos.az, -(thrust_sp(2) - thrust_unallocated(2)));
 
 				bool valid = (_hover_thrust_ekf.getHoverThrustEstimateVar() < 0.001f);
 
