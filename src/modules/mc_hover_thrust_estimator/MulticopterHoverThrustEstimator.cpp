@@ -165,18 +165,28 @@ void MulticopterHoverThrustEstimator::Run()
 		_vehicle_attitude_sub.copy(&vehicle_attitude);
 
 		vehicle_thrust_setpoint_s vehicle_thrust_setpoint;
+		control_allocator_status_s control_allocator_status;
 
 		if (_vehicle_thrust_setpoint_sub.update(&vehicle_thrust_setpoint)
+		    && _control_allocator_status_sub.update(&control_allocator_status)
 		    && (hrt_elapsed_time(&vehicle_thrust_setpoint.timestamp) < 20_ms)
 		    && (hrt_elapsed_time(&vehicle_attitude.timestamp) < 20_ms)
 		   ) {
+
 			const matrix::Quatf q_att{vehicle_attitude.q};
 
 			matrix::Vector3f thrust_body_sp(vehicle_thrust_setpoint.xyz);
+			matrix::Vector3f thrust_body_unallocated(control_allocator_status.unallocated_thrust);
+
 			thrust_body_sp(0) = 0.f; // ignore for now
 			thrust_body_sp(1) = 0.f; // ignore for now
 
-			matrix::Vector3f thrust_sp = q_att.rotateVector(thrust_body_sp);
+			thrust_body_unallocated(0) = 0.f; // ignore for now
+			thrust_body_unallocated(1) = 0.f; // ignore for now
+
+
+			matrix::Vector3f thrust_sp          = q_att.rotateVector(thrust_body_sp);
+			matrix::Vector3f thrust_unallocated = q_att.rotateVector(thrust_body_unallocated);
 
 			if (PX4_ISFINITE(thrust_sp(2))) {
 				// Inform the hover thrust estimator about the measured vertical
@@ -188,7 +198,7 @@ void MulticopterHoverThrustEstimator::Run()
 									1.f);
 
 				_hover_thrust_ekf.setMeasurementNoiseScale(fmaxf(meas_noise_coeff_xy, meas_noise_coeff_z));
-				_hover_thrust_ekf.fuseAccZ(-local_pos.az, -thrust_sp(2));
+				_hover_thrust_ekf.fuseAccZ(-local_pos.az, -(thrust_sp(2)-thrust_unallocated(2)));
 
 				bool valid = (_hover_thrust_ekf.getHoverThrustEstimateVar() < 0.001f);
 

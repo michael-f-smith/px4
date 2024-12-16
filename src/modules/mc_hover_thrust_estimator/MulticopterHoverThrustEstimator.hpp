@@ -59,6 +59,7 @@
 #include <uORB/topics/vehicle_local_position.h>
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/vehicle_thrust_setpoint.h>
+#include <uORB/topics/control_allocator_status.h>
 
 #include "zero_order_hover_thrust_ekf.hpp"
 
@@ -107,6 +108,7 @@ private:
 	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
 	uORB::Subscription _vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
 	uORB::Subscription _vehicle_thrust_setpoint_sub{ORB_ID(vehicle_thrust_setpoint)};
+	uORB::Subscription _control_allocator_status_sub{ORB_ID(control_allocator_status)};
 
 	hrt_abstime _timestamp_last{0};
 
