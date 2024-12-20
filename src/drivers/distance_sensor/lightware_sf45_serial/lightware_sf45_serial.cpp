@@ -38,10 +38,13 @@
 #include <termios.h>
 #include <lib/crc/crc.h>
 #include <lib/mathlib/mathlib.h>
+#include <matrix/matrix/math.hpp>
 
 #include <float.h>
 
 using namespace time_literals;
+using matrix::Quatf;
+using matrix::Vector3f;
 
 /* Configuration Constants */
 
@@ -649,11 +652,22 @@ void SF45LaserSerial::sf45_process_replies(float *distance_m)
 				PX4_DEBUG("scaled_yaw: \t %d, \t current_bin: \t %d, \t distance: \t %8.4f\n", scaled_yaw, current_bin,
 					  (double)*distance_m);
 
+				if (_vehicle_attitude_sub.updated()) {
+					vehicle_attitude_s vehicle_attitude;
+
+					if (_vehicle_attitude_sub.copy(&vehicle_attitude)) {
+						_vehicle_attitude = Quatf(vehicle_attitude.q);
+					}
+				}
+
+				_scale_dist(*distance_m, scaled_yaw, _vehicle_attitude);
+
 				if (_current_bin_dist > _obstacle_distance.max_distance) {
 					_current_bin_dist = _obstacle_distance.max_distance + 1; // As per ObstacleDistance.msg definition
 				}
 
 				hrt_abstime now = hrt_absolute_time();
+
 				_handle_missed_bins(current_bin, _previous_bin, _current_bin_dist, now);
 
 				_publish_obstacle_msg(now);
@@ -727,6 +741,20 @@ void SF45LaserSerial::_handle_missed_bins(uint8_t current_bin, uint8_t previous_
 		}
 	}
 }
+void 	SF45LaserSerial::_scale_dist(float &distance, const int16_t &yaw,  const matrix::Quatf &attitude)
+{
+	const Quatf q_sensor(Quatf(cosf(yaw / 2.f), 0.f, 0.f, sinf(yaw / 2.f)));
+	const Vector3f forward_vector(1.0f, 0.0f, 0.0f);
+
+	const Quatf q_sensor_rotation = attitude * q_sensor;
+
+	const Vector3f rotated_sensor_vector = q_sensor_rotation.rotateVector(forward_vector);
+
+	float sensor_dist_scale = rotated_sensor_vector.xy().norm();
+	sensor_dist_scale = math::constrain(sensor_dist_scale, FLT_EPSILON, 1.0f); // limit it to the expected range.
+	distance = distance * sensor_dist_scale;
+}
+
 uint8_t SF45LaserSerial::sf45_convert_angle(const int16_t yaw)
 {
 	uint8_t mapped_sector = 0;
