@@ -159,7 +159,7 @@ bool FlightTaskAuto::update()
 	_checkEmergencyBraking();
 	Vector3f waypoints[] = {_prev_wp, _position_setpoint, _next_wp};
 
-	if (isTargetModified()) {
+	if (isTargetModified()) { // TODO check if still needed
 		// In case object avoidance has injected a new setpoint, we take this as the next waypoints
 		waypoints[2] = _position_setpoint;
 	}
