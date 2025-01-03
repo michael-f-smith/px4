@@ -104,7 +104,6 @@ private:
 	uORB::Subscription _v_control_mode_sub{ORB_ID(vehicle_control_mode)};		/**< vehicle control mode subscription */
 	uORB::Subscription _autotune_attitude_control_status_sub{ORB_ID(autotune_attitude_control_status)};
 	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};
-	uORB::Subscription _vehicle_attitude_setpoint_sub{ORB_ID(vehicle_attitude_setpoint)};
 	uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};
 	uORB::Subscription _vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
 	uORB::Subscription _vehicle_local_position_sub{ORB_ID(vehicle_local_position)};
@@ -126,6 +125,13 @@ private:
 
 	float _man_yaw_sp{0.f};				/**< current yaw setpoint in manual mode */
 	float _man_tilt_max;			/**< maximum tilt allowed for manual flight [rad] */
+
+	SlewRate<float> _manual_throttle_minimum{0.f}; ///< 0 when landed and ramped to MPC_MANTHR_MIN in air
+	SlewRate<float> _manual_throttle_maximum{0.f}; ///< 0 when disarmed ramped to 1 when spooled up
+
+	AlphaFilter<float> _man_roll_input_filter;
+	AlphaFilter<float> _man_pitch_input_filter;
+
 	AlphaFilter<float> _man_x_input_filter;
 	AlphaFilter<float> _man_y_input_filter;
 
