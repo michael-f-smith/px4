@@ -99,12 +99,9 @@ private:
 
 	uORB::SubscriptionInterval _parameter_update_sub{ORB_ID(parameter_update), 1_s};
 
-<<<<<<< HEAD
-=======
 	uORB::Subscription _hover_thrust_estimate_sub{ORB_ID(hover_thrust_estimate)};
 	uORB::Subscription _vehicle_attitude_setpoint_sub{ORB_ID(vehicle_attitude_setpoint)};
 	uORB::Subscription _v_control_mode_sub{ORB_ID(vehicle_control_mode)};		/**< vehicle control mode subscription */
->>>>>>> 0a90621635 (multicopter hover thrust estimator use vehicle_thrust_setpoint (work in stabilized mode))
 	uORB::Subscription _autotune_attitude_control_status_sub{ORB_ID(autotune_attitude_control_status)};
 	uORB::Subscription _manual_control_setpoint_sub{ORB_ID(manual_control_setpoint)};
 	uORB::Subscription _vehicle_attitude_setpoint_sub{ORB_ID(vehicle_attitude_setpoint)};
@@ -125,22 +122,12 @@ private:
 
 	matrix::Vector3f _thrust_setpoint_body; /**< body frame 3D thrust vector */
 
-<<<<<<< HEAD
-	float _man_yaw_sp{0.f};                 /**< current yaw setpoint in manual mode */
-	float _man_tilt_max;                    /**< maximum tilt allowed for manual flight [rad] */
-
-	SlewRate<float> _manual_throttle_minimum{0.f}; ///< 0 when landed and ramped to MPC_MANTHR_MIN in air
-	SlewRate<float> _manual_throttle_maximum{0.f}; ///< 0 when disarmed ramped to 1 when spooled up
-	AlphaFilter<float> _man_roll_input_filter;
-	AlphaFilter<float> _man_pitch_input_filter;
-=======
 	float _hover_thrust{NAN};
 
 	float _man_yaw_sp{0.f};				/**< current yaw setpoint in manual mode */
 	float _man_tilt_max;			/**< maximum tilt allowed for manual flight [rad] */
 	AlphaFilter<float> _man_x_input_filter;
 	AlphaFilter<float> _man_y_input_filter;
->>>>>>> 0a90621635 (multicopter hover thrust estimator use vehicle_thrust_setpoint (work in stabilized mode))
 
 	hrt_abstime _last_run{0};
 	hrt_abstime _last_attitude_setpoint{0};
