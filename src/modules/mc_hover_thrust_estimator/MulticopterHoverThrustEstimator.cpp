@@ -172,9 +172,6 @@ void MulticopterHoverThrustEstimator::Run()
 		    && (hrt_elapsed_time(&vehicle_thrust_setpoint.timestamp) < 20_ms)
 		    && (hrt_elapsed_time(&vehicle_attitude.timestamp) < 20_ms)
 		   ) {
-
-			const matrix::Quatf q_att{vehicle_attitude.q};
-
 			matrix::Vector3f thrust_body_sp(vehicle_thrust_setpoint.xyz);
 			matrix::Vector3f thrust_body_unallocated(control_allocator_status.unallocated_thrust);
 			matrix::Vector3f thrust_body_allocated = thrust_body_sp - thrust_body_unallocated;
@@ -182,8 +179,8 @@ void MulticopterHoverThrustEstimator::Run()
 			thrust_body_allocated(0) = 0.f; // ignore for now
 			thrust_body_allocated(1) = 0.f; // ignore for now
 
+			const matrix::Quatf q_att{vehicle_attitude.q};
 			matrix::Vector3f thrust_allocated = q_att.rotateVector(thrust_body_allocated);
-
 
 			if (PX4_ISFINITE(thrust_allocated(2))) {
 				// Inform the hover thrust estimator about the measured vertical

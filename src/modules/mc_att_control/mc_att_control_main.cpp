@@ -126,8 +126,9 @@ MulticopterAttitudeControl::throttle_curve(float throttle_stick_input)
 
 	default: // 0 or other: rescale to hover throttle at 0 stick input
 		thrust = math::interpolateNXY(throttle_stick_input,
-				      {-1.f, 0.f, 1.f},
-				      {_manual_throttle_minimum.getState(), _hover_thrust, _param_mpc_thr_max.get()});
+		{-1.f, 0.f, 1.f},
+		{_manual_throttle_minimum.getState(), _hover_thrust, _param_mpc_thr_max.get()});
+		break;
 	}
 
 	return math::min(thrust, _manual_throttle_maximum.getState());
