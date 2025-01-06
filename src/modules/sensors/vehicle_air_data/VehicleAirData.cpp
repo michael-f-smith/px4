@@ -239,6 +239,28 @@ void VehicleAirData::Run()
 		}
 	}
 
+	// when baros dont get calibrated, set the offset in respect to the current sensor
+	// this avoids height jumps when switching to a new sensor
+	if (_selected_sensor_sub_index >= 0
+	    && fabsf(_calibration[_selected_sensor_sub_index].offset() - _selected_baro_offset) > FLT_EPSILON) {
+
+		sensor_baro_s report;
+		_selected_baro_offset = _calibration[_selected_sensor_sub_index].offset();
+		_sensor_sub[_selected_sensor_sub_index].copy(&report);
+		float selected_baro_pressure = report.pressure;
+
+		for (int instance = 0; instance < MAX_SENSOR_COUNT; instance++) {
+			if (instance != _selected_sensor_sub_index && _advertised[instance]) {
+
+				_sensor_sub[instance].copy(&report);
+				_calibration[instance].set_offset(report.pressure - selected_baro_pressure);
+				_calibration[instance].ParametersSave(instance);
+			}
+		}
+
+		ParametersUpdate(true);
+	}
+
 	// Publish
 	if (_param_sens_baro_rate.get() > 0) {
 		int interval_us = 1e6f / _param_sens_baro_rate.get();
