@@ -176,9 +176,6 @@ void MulticopterHoverThrustEstimator::Run()
 			matrix::Vector3f thrust_body_unallocated(control_allocator_status.unallocated_thrust);
 			matrix::Vector3f thrust_body_allocated = thrust_body_sp - thrust_body_unallocated;
 
-			thrust_body_allocated(0) = 0.f; // ignore for now
-			thrust_body_allocated(1) = 0.f; // ignore for now
-
 			const matrix::Quatf q_att{vehicle_attitude.q};
 			matrix::Vector3f thrust_allocated = q_att.rotateVector(thrust_body_allocated);
 

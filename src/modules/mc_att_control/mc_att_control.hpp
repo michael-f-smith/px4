@@ -132,9 +132,6 @@ private:
 	AlphaFilter<float> _man_roll_input_filter;
 	AlphaFilter<float> _man_pitch_input_filter;
 
-	AlphaFilter<float> _man_x_input_filter;
-	AlphaFilter<float> _man_y_input_filter;
-
 	hrt_abstime _last_run{0};
 	hrt_abstime _last_attitude_setpoint{0};
 
