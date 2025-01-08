@@ -114,7 +114,7 @@ private:
 	bool				_crc_valid{false};
 
 	void 				_handle_missed_bins(uint8_t current_bin, uint8_t previous_bin, uint16_t measurement, hrt_abstime now);
-	void 				_scale_dist(float &distance, const int16_t &yaw,  const matrix::Quatf &attitude);
+	void _project_distance_on_horizontal_plane(float &distance, const int16_t &yaw, const matrix::Quatf &q_world_vehicle);
 	void 				_publish_obstacle_msg(hrt_abstime now);
 	uORB::Subscription 		_vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
 	uint64_t			_data_timestamps[BIN_COUNT];
